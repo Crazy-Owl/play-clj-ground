@@ -10,9 +10,12 @@
 
   :on-render
   (fn [screen entities]
-    (println entities)
     (clear!)
-    (render! screen entities)))
+    (render! screen entities))
+
+  :my-test-fn
+  (fn [screen entities]
+    (println (str "in my-test-fn, arg is " (:arg screen)))))
 
 (defscreen overlay-screen
   :on-show
@@ -22,8 +25,12 @@
 
   :on-render
   (fn [screen entities]
-    (println entities)
-    (render! screen entities)))
+    (render! screen entities))
+
+  :on-key-down
+  (fn [screen entities]
+    (run! main-screen :my-test-fn :arg (:key screen))
+    entities))
 
 (defgame play-clj-ground
   :on-create
