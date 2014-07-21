@@ -18,7 +18,7 @@
 
   :my-test-fn
   (fn [screen entities]
-    (println (str "in my-test-fn, arg is " (:arg screen))))
+    (println (str "in my-test-fn, arg is " (:arg screen) ", arg2 is " (:arg2 screen))))
 
   :on-touch-down
   (fn [screen entities]
@@ -43,7 +43,9 @@
 (defscreen overlay-screen
   :on-show
   (fn [screen entities]
-    (update! screen :renderer (stage))
+    (update! screen
+             :renderer (stage)
+             :test-message "test")
     [(assoc (label "0" (color :green)) :x 100 :y 200 :id :fps)
      (assoc (label "0" (color :red)) :x 100 :y 250 :id :dt)])
 
@@ -55,7 +57,7 @@
 
   :on-key-down
   (fn [screen entities]
-    (run! main-screen :my-test-fn :arg (:key screen))
+    (run! main-screen :my-test-fn :arg (:key screen) :arg2 (:test-message screen))
     (case @current-mode
       :begin (condp = (:key screen)
                (key-code :a) (reset! current-mode :a)
