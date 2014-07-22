@@ -1,7 +1,8 @@
 (ns play-clj-ground.core
   (:require [play-clj.core :refer :all]
             [play-clj.ui :refer :all]
-            [play-clj.g2d :refer :all]))
+            [play-clj.g2d :refer :all])
+  (:use play-clj-ground.entities))
 
 (def current-mode (atom nil))
 
