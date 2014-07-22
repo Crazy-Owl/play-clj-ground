@@ -8,23 +8,26 @@
 
 (defprotocol ViewportP
   (get-coords [this] "get coordinates of viewport")
-  (point-at [this coords] "center the viewport at given coordinates"))
+  (point-at! [this coords] "center the viewport at given coordinates"))
 
 (defprotocol CellP
   (get-texture [this] "returns texture for this cell")
   (get-objects [this] "returns objects residing at this cell")
-  (set-texture [this new-texture] "sets the texture for this cell")
-  (modify-objects [this fn] "modifies objects in this cell using fn"))
+  (set-texture! [this new-texture] "sets the texture for this cell")
+  (modify-objects! [this fn] "modifies objects in this cell using fn"))
 
 (deftype TiledMap [cells viewport]
   MapP
   (get-viewport [this] viewport)
   (get-cell [this [x y]] nil)
-  (get-objects-at [this [x y]] nil))
+  (get-objects-at [this [x y]] nil)
+  Entity
+  (draw-entity! [this screen batch]
+    (draw-entity! viewport screen batch)))
 
 (deftype Viewport [^:volatile-mutable coords tiled-map]
   ViewportP
   (get-coords [this] coords)
-  (point-at [this new-coords] (set! coords new-coords))
+  (point-at! [this new-coords] (set! coords new-coords))
   Entity
   (draw-entity! [this screen batch]))
