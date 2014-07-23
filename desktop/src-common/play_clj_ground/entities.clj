@@ -4,6 +4,7 @@
 (defprotocol MapP
   (get-viewport [this] "returns the viewport associated with the map")
   (get-cell [this coords] "return the cell at given coordinates")
+  (set-cell! [this coords new-cell] "set the given cell")
   (get-objects-at [this coords] "return the objects at given coordinates"))
 
 (defprotocol ViewportP
@@ -24,11 +25,14 @@
   (set-texture! [this new-texture] (set! texture new-texture))
   (modify-objects! [this f] (set! objects (vec (doall (map f objects))))))
 
-(deftype TiledMap [cells viewport]
+(deftype TiledMap [^:volatile-mutable cells viewport]
   MapP
   (get-viewport [this] viewport)
   (get-cell [this [x y]] nil)
   (get-objects-at [this [x y]] nil)
+  (set-cell! [this [x y] new-cell]
+    (let [cell-row (get cells y)]
+      (set! cells (assoc cells y (assoc cell-row x new-cell)))))
   Entity
   (draw-entity! [this screen batch]
     (draw-entity! viewport screen batch)))
