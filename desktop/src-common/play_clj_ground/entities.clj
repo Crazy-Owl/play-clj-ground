@@ -1,6 +1,10 @@
 (ns play-clj-ground.entities
   (:require [play-clj.entities :refer [Entity draw-entity!]]))
 
+(defprotocol TextureStorageP
+  (get-texture [this name] "get texture by its name. Loads textures on demand if needed")
+  (load-textures [this spec] "load textures according to texture sheet specs"))
+
 (defprotocol MapP
   (get-viewport [this] "returns the viewport associated with the map")
   (get-cell [this coords] "return the cell at given coordinates")
@@ -17,6 +21,11 @@
   (get-objects [this] "returns objects residing at this cell")
   (set-texture! [this new-texture] "sets the texture for this cell")
   (modify-objects! [this f] "modifies objects in this cell using fn"))
+
+(deftype TextureStorage [path textures]
+  TextureStorageP
+  (get-texture [this name] (get textures name))
+  (load-textures [this spec])) ;; TODO: spec format, load the specs
 
 (deftype MapCell [^:volatile-mutable texture params ^:volatile-mutable objects]
   CellP
