@@ -1,5 +1,5 @@
 (ns play-clj-ground.entities
-  (:require [play-clj.entities :refer [Entity]]))
+  (:require [play-clj.entities :refer [Entity draw-entity!]]))
 
 (defprotocol MapP
   (get-viewport [this] "returns the viewport associated with the map")
@@ -8,13 +8,21 @@
 
 (defprotocol ViewportP
   (get-coords [this] "get coordinates of viewport")
+  (get-map [this] "get underlying map object")
   (point-at! [this coords] "center the viewport at given coordinates"))
 
 (defprotocol CellP
   (get-texture [this] "returns texture for this cell")
   (get-objects [this] "returns objects residing at this cell")
   (set-texture! [this new-texture] "sets the texture for this cell")
-  (modify-objects! [this fn] "modifies objects in this cell using fn"))
+  (modify-objects! [this f] "modifies objects in this cell using fn"))
+
+(deftype MapCell [^:volatile-mutable texture params ^:volatile-mutable objects]
+  CellP
+  (get-texture [this] texture)
+  (get-objects [this] objects)
+  (set-texture! [this new-texture] (set! texture new-texture))
+  (modify-objects! [this f] (set! objects (vec (doall (map f objects))))))
 
 (deftype TiledMap [cells viewport]
   MapP
@@ -28,6 +36,7 @@
 (deftype Viewport [^:volatile-mutable coords tiled-map]
   ViewportP
   (get-coords [this] coords)
+  (get-map [this] tiled-map)
   (point-at! [this new-coords] (set! coords new-coords))
   Entity
   (draw-entity! [this screen batch]))
